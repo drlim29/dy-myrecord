@@ -29,10 +29,20 @@ const server = http.createServer(app);
 const hostname = '127.0.0.1';
 const port = 3000;
 
+//TODO : LOGGER
+//웹개발실무-Lect09-Node_ejs-pdf(1).pdf : p26
+/*
 
+*/
+
+const bodyParser = require('body-parser');
+const static = require('serve-static');
+app.use(bodyParser.urlencoded({extended:false})); //application/x-www-form-urlencoded 파싱
+app.use(bodyParser.json());                       //application/json 으로 파싱
 
 //public 폴더에 있는 js, css, img 사용을 위하여 로드
 app.use(express.static(path.join(__dirname, "public")))
+
 
 // app.use(require('serve-static')(__dirname + '/../../public'));
 // app.use(require('cookie-parser')());
@@ -140,7 +150,8 @@ app.set('views', './views');
 // 루트접근시 index render
 app.get('/', (req, res) => {
 console.log(req.user, 'main - req.user');
-  res.render('index');
+console.log(JSON.parse(JSON.stringify(req.user))[0], 'JSON.parse(JSON.stringify(req.user))')
+  res.render('index', {sess:JSON.parse(JSON.stringify(req.user))[0]});
 })
 
 // login

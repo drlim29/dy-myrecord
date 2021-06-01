@@ -324,11 +324,17 @@
 
                         <div class="topbar-divider d-none d-sm-block"></div>
 
+
+                        <!-- sessionData :  -->
+                        <!-- <% for(key in sess){%> 
+                        <!-- <%=key%> : <%= sess[key] %><br /> -->
+                        <!-- <%} %> -->
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
+                            <% if (Object.values(sess).length > 0) {%>
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><%= sess['email']%></span>
                                 <img class="img-profile rounded-circle"
                                     src="img/undraw_profile.svg">
                             </a>
@@ -353,6 +359,9 @@
                                     Logout
                                 </a>
                             </div>
+                            <% } else { %>
+                            <a href="/login">LOGIN</a>
+                            <% }%>
                         </li>
 
                     </ul>
