@@ -23,6 +23,7 @@ db_config.connect(conn);
 //     }
 // })
 
+
 //express정보
 const app = express();
 const server = http.createServer(app);
@@ -149,9 +150,12 @@ app.set('views', './views');
 
 // 루트접근시 index render
 app.get('/', (req, res) => {
-console.log(req.user, 'main - req.user');
-console.log(JSON.parse(JSON.stringify(req.user))[0], 'JSON.parse(JSON.stringify(req.user))')
-  res.render('index', {sess:JSON.parse(JSON.stringify(req.user))[0]});
+  console.log(req.user, 'req.user')
+  let sessInfo = {}
+  if (typeof req.user !== "undefined") {
+    sessInfo = req.user;
+  }
+  res.render('index', {sess:sessInfo});
 })
 
 // login
