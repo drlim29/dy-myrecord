@@ -1,2 +1,0 @@
-# dy-myrecord
-dongyang project
