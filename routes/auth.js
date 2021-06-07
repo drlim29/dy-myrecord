@@ -20,6 +20,13 @@ router.get('/kakao', passport.authenticate('kakao', {
 );
 
 
+//kakao 로그아웃 ( 세션끊기 )
+router.get('/kakao/logout', (req, res) => {
+    req.logout();
+
+    res.redirect("/");
+});
+
 // 3. /auth/kakao/callback으로 프로필 반환
 router.get('/kakao/callback', passport.authenticate('kakao', {
     successRedirect: '/',

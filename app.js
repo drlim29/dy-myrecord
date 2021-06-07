@@ -151,7 +151,7 @@ app.set('views', './views');
 // 루트접근시 index render
 app.get('/', (req, res) => {
   console.log(req.user, 'req.user')
-  let sessInfo = {}
+  let sessInfo = {};
   if (typeof req.user !== "undefined") {
     sessInfo = req.user;
   }
