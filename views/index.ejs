@@ -18,6 +18,7 @@
 
     <!-- Custom styles for this template-->
     <link href="/css/sb-admin-2.css" rel="stylesheet">
+
 </head>
 
 <body id="page-top">
@@ -31,7 +32,7 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
                 <div class="sidebar-brand-icon">
-                    <i class="far fa-address-card"></i>
+                    <i class="fas fa-feather-alt"></i>
                 </div>
                 <div class="sidebar-brand-text mx-3">My Record</div>
             </a>
@@ -783,8 +784,36 @@
         </div>
     </div>
 
+
+    <!-- 정보 공유 동의여부 Modal-->
+    
+    <% if (Object.values(sess).length > 0 && sess.agree == 'N') {
+        %>
+    <div class="modal fade" id="agreeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">정보 공유 동의</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close" onclick="chkExpire()">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">추후 정보를 가족/지인 에게 공유하기를 동의하십니까?<br /><br />비동의 시, 1시간마다 동의 여부를 확인합니다.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal" onclick="chkExpire()">비동의</button>
+                    <button class="btn btn-primary" type="button" data-dismiss="modal" onclick="setAgree()">동의</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    
+
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/jquery/jquery.cookie.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
@@ -799,7 +828,41 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        const expireDate = $.cookie('agreeModalExpire');
+        if (expireDate == undefined || expireDate < new Date().getTime() ) {
+            $("#agreeModal").modal('show');
+        }
+    });
 
+    function chkExpire() {
+        console.log('chkExpire---');
+        dt = new Date();
+        dt.setMinutes( dt.getMinutes() + 60 );
+        $.cookie('agreeModalExpire', dt.getTime(), { expires: 999 , path: location.href});
+    }
+
+    function setAgree() {
+        sendPost('/setAgree', {agree:true});
+    }
+
+    function sendPost(url, params) {
+        var form = document.createElement('form');
+        form.setAttribute('method', 'post');
+        form.setAttribute('action', url);
+        document.charset ='utf-8';
+        for (let key in params) {
+            var hiddenField = document.createElement('input');
+            hiddenField.setAttribute('type','hidden');
+            hiddenField.setAttribute('name', key);
+            hiddenField.setAttribute('value', params[key]);
+            form.appendChild(hiddenField);
+        }
+        document.body.appendChild(form);
+        form.submit();
+    }
+    </script>
 </body>
 
 </html>
