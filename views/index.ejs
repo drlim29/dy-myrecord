@@ -415,15 +415,39 @@
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                        <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
                     </div>
 
                     <!-- Content Row -->
-                    <div class="row">
-
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                정보공유 동의 여부</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                <% if (Object.values(sess).length > 0 && sess.agree == 'Y') {%>
+                                                정보공유에 동의하였습니다.
+                                                <% } else {%>
+                                                정보공유에 동의하지 않았습니다.
+                                                <a class="ml-4 d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" href="#" data-toggle="modal" data-target="#agreeModal">
+                                                    동의하기
+                                                </a>
+                                                <% }%>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-share-alt fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
+                        <!-- <div class="col-xl-3 col-md-6 mb-4">
                             <div class="card border-left-primary shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
@@ -438,10 +462,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
+                        <!-- <div class="col-xl-3 col-md-6 mb-4">
                             <div class="card border-left-success shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
@@ -456,10 +480,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Earnings (Monthly) Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
+                        <!-- <div class="col-xl-3 col-md-6 mb-4">
                             <div class="card border-left-info shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
@@ -485,10 +509,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Pending Requests Card Example -->
-                        <div class="col-xl-3 col-md-6 mb-4">
+                        <!-- <div class="col-xl-3 col-md-6 mb-4">
                             <div class="card border-left-warning shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
@@ -503,13 +527,12 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- Content Row -->
 
                     <div class="row">
-
                         <!-- Area Chart -->
                         <div class="col-xl-8 col-lg-7">
                             <div class="card shadow mb-4">
@@ -786,9 +809,6 @@
 
 
     <!-- 정보 공유 동의여부 Modal-->
-    
-    <% if (Object.values(sess).length > 0 && sess.agree == 'N') {
-        %>
     <div class="modal fade" id="agreeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -807,7 +827,6 @@
             </div>
         </div>
     </div>
-    <% } %>
 
     
 
@@ -830,14 +849,15 @@
     <script src="js/demo/chart-pie-demo.js"></script>
     <script type="text/javascript">
     $(document).ready(function(){
+        const sess = JSON.parse('<%- JSON.stringify(sess) %>');
         const expireDate = $.cookie('agreeModalExpire');
-        if (expireDate == undefined || expireDate < new Date().getTime() ) {
+        if ( (Object.values(sess).length > 0 && sess.agree == 'N') &&
+             (expireDate == undefined || expireDate < new Date().getTime()) ) {
             $("#agreeModal").modal('show');
         }
     });
 
     function chkExpire() {
-        console.log('chkExpire---');
         dt = new Date();
         dt.setMinutes( dt.getMinutes() + 60 );
         $.cookie('agreeModalExpire', dt.getTime(), { expires: 999 , path: location.href});
