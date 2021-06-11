@@ -114,7 +114,12 @@ router.get('/', function (req, res) {
   //   })
   // })
 
-  res.render('testam.ejs');
+  let sessInfo = {};
+  if (typeof req.user !== "undefined") {
+    sessInfo = parseSession(req.user);
+  }
+  res.render('testam', {sess:sessInfo});
+  // res.render('testam.ejs');
 })
 
 router.get('/ideas/delete/:id', function (req, res) {
@@ -140,5 +145,13 @@ router.get('/edit/:id', function (req, res) {
 router.post('/edit/:id', function (req, res) {
 
 })
+
+//세션 파싱
+function parseSession(sess)
+{
+    sessInfo = JSON.parse(JSON.stringify(sess));
+    sessInfo = sessInfo[0];
+    return sessInfo;
+}
 
 module.exports = router;

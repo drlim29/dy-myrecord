@@ -1,10 +1,12 @@
 const http = require('http');
+const expressLayouts = require('express-ejs-layouts');
 const express = require('express');
 
 const router = express.Router();
 const path = require('path');
 const ejs = require('ejs');
 const passport = require('passport');
+const moment = require('moment');
 const KakaoStrategy = require('passport-kakao').Strategy;
 const auth_config  = require('./config/auth_config.json');
 
@@ -43,6 +45,16 @@ app.use(bodyParser.json());                       //application/json 으로 파�
 
 //public 폴더에 있는 js, css, img 사용을 위하여 로드
 app.use(express.static(path.join(__dirname, "public")))
+
+//로그를 위한 middleware
+const myLogger = function (req, res, next) {
+  console.log('LOGGED');
+  next();
+};
+
+app.use(myLogger);
+
+
 
 
 // app.use(require('serve-static')(__dirname + '/../../public'));
@@ -141,10 +153,19 @@ function chkLogin(info, done) {
   });
 }
 
+//세션 파싱
+function parseSession(sess)
+{
+    sessInfo = JSON.parse(JSON.stringify(sess));
+    sessInfo = sessInfo[0];
+    return sessInfo;
+}
 
 //ejs engine 사용
 app.set('view engine', 'ejs');
 app.set('views', './views');
+// app.set('layout', 'layout'); //express-ejs-layout 경로 지정
+app.use(expressLayouts);    
 
 
 
@@ -153,15 +174,39 @@ app.get('/', (req, res) => {
   console.log(req.user, 'req.user')
   let sessInfo = {};
   if (typeof req.user !== "undefined") {
-    sessInfo = req.user;
+    sessInfo = parseSession(req.user);
   }
-  res.render('index', {sess:sessInfo});
+  res.render('main', {sess:sessInfo});
 })
 
+
+// ì젙蹂´ 怨듭쑀 ë룞ì쓽 í뙘ì뾽
+app.post('/setAgree', (req, res) => {
+    if (typeof req.user === "undefined") {
+        //session expire check
+        res.status(401).send("session expire");
+    } else {
+      const sessInfo = parseSession(req.user);
+     
+      //update
+      const sqlUpdate = 'UPDATE auth SET agree = ?, agree_date = ? WHERE account_seq = ?';
+      const paramsUpdate = ['Y', moment(new Date).format('YYYY-MM-DD HH:mm:ss'), sessInfo.account_seq];
+      conn.query(sqlUpdate, paramsUpdate, (err, rows, authInfo) => {
+        if (err) {
+          console.log(err, 'err');
+          return done(err);
+        }
+  
+        //redirect
+        res.redirect('/');
+      });
+    }
+  })
+
 // login
-app.get('/login', (req, res)=> {
-  res.render('login.ejs');
-});
+// app.get('/login', (req, res)=> {
+//   res.render('login.ejs');
+// });
 
 // testament
 app.get('/testament', (req, res)=> {
