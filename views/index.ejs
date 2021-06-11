@@ -786,9 +786,6 @@
 
 
     <!-- 정보 공유 동의여부 Modal-->
-    
-    <% if (Object.values(sess).length > 0 && sess.agree == 'N') {
-        %>
     <div class="modal fade" id="agreeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -807,7 +804,6 @@
             </div>
         </div>
     </div>
-    <% } %>
 
     
 
@@ -830,14 +826,15 @@
     <script src="js/demo/chart-pie-demo.js"></script>
     <script type="text/javascript">
     $(document).ready(function(){
+        const sess = JSON.parse('<%- JSON.stringify(sess) %>');
         const expireDate = $.cookie('agreeModalExpire');
-        if (expireDate == undefined || expireDate < new Date().getTime() ) {
+        if ( (Object.values(sess).length > 0 && sess.agree == 'N') &&
+             (expireDate == undefined || expireDate < new Date().getTime()) ) {
             $("#agreeModal").modal('show');
         }
     });
 
     function chkExpire() {
-        console.log('chkExpire---');
         dt = new Date();
         dt.setMinutes( dt.getMinutes() + 60 );
         $.cookie('agreeModalExpire', dt.getTime(), { expires: 999 , path: location.href});
