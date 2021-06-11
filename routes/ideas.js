@@ -81,7 +81,7 @@
 // ./routes/auth.js
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
+// const passport = require('passport');
 
 
 //db
@@ -91,50 +91,54 @@ const conn = db_config.init();
 db_config.connect(conn);
 
 
-const app = express()
+// const app = express()
 
-app.use(bodyParser.urlencoded({
-  extended: false
-}))
+// app.use(bodyParser.urlencoded({
+//   extended: false
+// }))
 
-app.listen(52273, function () {
-  console.log('Server is running at : http://127.0.0.1:52273')
+// app.listen(52273, function () {
+//   console.log('Server is running at : http://127.0.0.1:52273')
+// })
+
+router.get('/', function (req, res) {
+  // fs.readFile('list.ejs', 'utf8', function (err, data) {
+  //   client.query('select * from MusicList', function (err, results) {
+  //     if (err) {
+  //       res.send(err)
+  //     } else {
+  //       res.send(ejs.render(data, {
+  //         data: results
+  //       }))
+  //     }
+  //   })
+  // })
+
+  res.render('testam.ejs');
 })
 
-app.get('/', function (req, res) {
-  fs.readFile('list.ejs', 'utf8', function (err, data) {
-    client.query('select * from MusicList', function (err, results) {
-      if (err) {
-        res.send(err)
-      } else {
-        res.send(ejs.render(data, {
-          data: results
-        }))
-      }
-    })
-  })
-})
-
-app.get('/ideas/delete/:id', function (req, res) {
+router.get('/ideas/delete/:id', function (req, res) {
   client.query('delete from MusicList where id=?', [req.params.id], function () {
     res.redirect('/')
   })
 })
 
-app.get('/insert', function (req, res) {
+router.get('/insert', function (req, res) {
   fs.readFile('insert.html', 'utf8', function (err, data) {
     res.send(data)
   })
 })
 
-app.post('/insert', function (req, res) {
+router.post('/insert', function (req, res) {
 
 })
 
-app.get('/edit/:id', function (req, res) {
+router.get('/edit/:id', function (req, res) {
 
 })
 
-app.post('/edit/:id', function (req, res) {
+router.post('/edit/:id', function (req, res) {
 
 })
+
+module.exports = router;

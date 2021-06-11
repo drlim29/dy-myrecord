@@ -170,10 +170,11 @@ app.get('/testament', (req, res)=> {
 
 //router
 const auth = require('./routes/auth');
-const { response } = require('express');
+const ideas = require('./routes/ideas');
 
 //router user
 app.use('/auth', auth);
+app.use('/ideas', ideas);
 
 
 
