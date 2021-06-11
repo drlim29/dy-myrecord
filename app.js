@@ -5,7 +5,6 @@ const router = express.Router();
 const path = require('path');
 const ejs = require('ejs');
 const passport = require('passport');
-const moment = require('moment');
 const KakaoStrategy = require('passport-kakao').Strategy;
 const auth_config  = require('./config/auth_config.json');
 
@@ -60,12 +59,14 @@ app.use(passport.session());
 
 //passport.serializeUser() - 로그인 성공시 호출
 passport.serializeUser((user, done) => { // Strategy 성공 시 호출됨
+  console.log('---------user - serialize--------------')
   return done(null, user.id); // 여기의 user._id가 req.session.passport.user에 저장
 });
 
 //passport.deserializeUser() - 페이지를 방문할 때마다 콜백함수 실행 (페이지접속 유저가 유효한 유저인지 체크)
 passport.deserializeUser(async (id, done) => { // 매개변수 id는 req.session.passport.user에 저장된 값
   try {
+      console.log(id, '----------------user-deserializeUser------')
       const sql = 'SELECT * FROM auth WHERE account_id = ?';
 // console.log(id, 'deserial- id');
       const params = [id];
@@ -75,6 +76,7 @@ passport.deserializeUser(async (id, done) => { // 매개변수 id는 req.session
               console.log(err, '로그인유지 실패');
               return done(err, rows); 
           } else {
+              console.log('로그인유지');
               return done(null, rows)
           }
       });
@@ -124,6 +126,7 @@ function chkLogin(info, done) {
                   console.log(err);
                   return done(err);
               } else {
+                  console.log(rows);
                   return done(err, rows);
               }
           });
@@ -131,17 +134,13 @@ function chkLogin(info, done) {
           return done(err, rows);
       } else {
           //기존 있는 데이터
+          console.log('기존에 등록된 데이터');
+          console.log(info, 'info');
           return done(err, info);
       }
   });
 }
 
-function parseSession(sess)
-{
-    sessInfo = JSON.parse(JSON.stringify(sess));
-    sessInfo = sessInfo[0];
-    return sessInfo;
-}
 
 //ejs engine 사용
 app.set('view engine', 'ejs');
@@ -151,41 +150,22 @@ app.set('views', './views');
 
 // 루트접근시 index render
 app.get('/', (req, res) => {
+  console.log(req.user, 'req.user')
   let sessInfo = {};
   if (typeof req.user !== "undefined") {
-    sessInfo = parseSession(req.user);
+    sessInfo = req.user;
   }
-  
   res.render('index', {sess:sessInfo});
-})
-
-
-// 정보 공유 동의 팝업
-app.post('/setAgree', (req, res) => {
-  if (typeof req.user === "undefined") {
-      //session expire check
-      res.status(401).send("session expire");
-  } else {
-    const sessInfo = parseSession(req.user);
-   
-    //update
-    const sqlUpdate = 'UPDATE auth SET agree = ?, agree_date = ? WHERE account_seq = ?';
-    const paramsUpdate = ['Y', moment(new Date).format('YYYY-MM-DD HH:mm:ss'), sessInfo.account_seq];
-    conn.query(sqlUpdate, paramsUpdate, (err, rows, authInfo) => {
-      if (err) {
-        console.log(err, '정보동의 쿼리 실패');
-        return done(err);
-      }
-
-      //redirect
-      res.redirect('/');
-    });
-  }
 })
 
 // login
 app.get('/login', (req, res)=> {
   res.render('login.ejs');
+});
+
+// testament
+app.get('/testament', (req, res)=> {
+  res.render('testament.ejs');
 });
 
 //router
