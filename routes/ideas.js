@@ -118,7 +118,28 @@ router.get('/', function (req, res) {
   if (typeof req.user !== "undefined") {
     sessInfo = parseSession(req.user);
   }
-  res.render('testam', {sess:sessInfo});
+
+  //select Query
+  const sqlSelect = 'SELECT * FROM testament WHERE account_seq = ?';
+  const paramsSelect = [sessInfo.account_seq];  //세션에서 가져온 account_seq값
+  
+  //쿼리실행
+  conn.query(sqlSelect, paramsSelect, (err, rows, testamentInfo) => { //callback함수 (쿼리 실행 뒤에 실행 프로세스)
+    console.log(rows, 'rows');
+    // console.log(testamentInfo, 'testamentInfo');
+
+    if (err) {
+        console.log(err, 'Select 실패');
+        return done(err);
+    }
+
+    //가져온 데이터로 render
+    res.render('testam', {sess:sessInfo, data : rows});
+
+  });
+
+
+
   // res.render('testam.ejs');
 })
 
