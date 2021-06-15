@@ -216,10 +216,13 @@ app.get('/testament', (req, res)=> {
 //router
 const auth = require('./routes/auth');
 const ideas = require('./routes/ideas');
+const voice = require('./routes/voice');
+
 
 //router user
 app.use('/auth', auth);
 app.use('/ideas', ideas);
+app.use('/voice', voice);
 
 
 
