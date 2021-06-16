@@ -209,19 +209,19 @@ app.post('/setAgree', (req, res) => {
 // });
 
 // testament
-app.get('/testament', (req, res)=> {
-  res.render('testament.ejs');
-});
+// app.get('/testam', (req, res)=> {
+//   res.render('testam.ejs');
+// });
 
 //router
 const auth = require('./routes/auth');
-const ideas = require('./routes/ideas');
+const testam = require('./routes/testam');
 const voice = require('./routes/voice');
 
 
 //router user
 app.use('/auth', auth);
-app.use('/ideas', ideas);
+app.use('/testam', testam);
 app.use('/voice', voice);
 
 
