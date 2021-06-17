@@ -71,8 +71,15 @@ app.use(passport.session());
 
 //passport.serializeUser() - 로그인 성공시 호출
 passport.serializeUser((user, done) => { // Strategy 성공 시 호출됨
-  console.log('---------user - serialize--------------')
-  return done(null, user.id); // 여기의 user._id가 req.session.passport.user에 저장
+  // console.log('---------user - serialize--------------')
+  
+    // console.log(user, '--user-serialize--');
+  if ((user.length !== 0 && typeof user["account_id"] != 'undefined') || typeof user["id"] !== 'undefined') {
+    // console.log(user["account_id"], 'user[account_id]')
+    // console.log(user["id"], 'user[id]')
+    // user = JSON.parse(JSON.stringify(user))[0];
+    return done(null, user["account_id"] ?? user["id"]); // 여기의 user._id가 req.session.passport.user에 저장
+  }
 });
 
 //passport.deserializeUser() - 페이지를 방문할 때마다 콜백함수 실행 (페이지접속 유저가 유효한 유저인지 체크)
@@ -118,12 +125,14 @@ function chkLogin(info, done) {
   const sqlSelect = 'SELECT * FROM auth WHERE account_id = ?';
   const paramsSelect = [info.id];
   conn.query(sqlSelect, paramsSelect, (err, rows, authInfo) => {
+    console.log(rows, '로그인 SELECT --- rows')
+    console.log(rows.length, 'rows.length---')
       if (err) {
           console.log(err, '로그인실패');
           return done(err);
       }
 
-      if (!authInfo) {
+      if (!authInfo || rows.length === 0) {
           //계정정보가 없으면 등록
           const sqlCreate = 'INSERT INTO auth (`media_seq`, `status`, `account_id`, `email`, `access_token`,`refresh_token`, `expire_time`, `create_date`, `update_date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? )'+
                               ' ON DUPLICATE KEY UPDATE '+
@@ -133,13 +142,24 @@ function chkLogin(info, done) {
           const paramsCreate = [1, '', info.id, info._json.kakao_account.email, info.accessToken,
                           info.refreshToken, 0, new Date(), new Date(),
                           info.accessToken, 0, new Date()];
+
           conn.query(sqlCreate, paramsCreate, (err, rows, fields) => {
               if (err) {
                   console.log(err);
                   return done(err);
               } else {
-                  console.log(rows);
-                  return done(err, rows);
+                const sqlSelect = 'SELECT * FROM auth WHERE account_id = ?';
+                const paramsSelect = [info.id];
+                conn.query(sqlSelect, paramsSelect, (err, rows, authInfo) => {
+                  if (err) {
+                    return done(err)
+                  }
+//                   console.log(sqlSelect, 'sqlSelect');
+//                   console.log(paramsSelect, )
+//                   console.log(rows, '-----create--select---rows')
+// console.log(JSON.parse(JSON.stringify(rows))[0], 'JSON.parse(JSON.stringify(rows))[0]')
+                  return done(err, JSON.parse(JSON.stringify(rows))[0]);
+                });
               }
           });
 
@@ -156,8 +176,10 @@ function chkLogin(info, done) {
 //세션 파싱
 function parseSession(sess)
 {
+  if (typeof sess === 'undefined' || sess.length === 0) return {};
     sessInfo = JSON.parse(JSON.stringify(sess));
     sessInfo = sessInfo[0];
+    console.log(sessInfo, 'sessInfo');
     return sessInfo;
 }
 
