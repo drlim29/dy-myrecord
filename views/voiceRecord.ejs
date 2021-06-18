@@ -10,7 +10,7 @@
         <form action="/voice/recordInsert" name="voice_content" method="GET">
             <table>
             <input type="text" id="account_id" hidden/>        
-            <tr><td>작성자</td>   <td><input disable type="text" name="account_id" value="1760576225"/></td></tr>
+            <tr><td>작성자</td>   <td><input disable type="text" name="account_id" value="1760576225"/><%=data[0].account_id %></td></tr>
             <tr><td>작성일시</td> <td><input type="text" name="reporting_date" value="2021-06-09"/> </td></tr>
             <tr><td>제목</td>     <td><input type="text" name="title" value="test" /></td></tr>
             <tr><td>내용</td>     <td><input type="text" name="content" value="test" /></td></tr>

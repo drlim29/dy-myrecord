@@ -72,35 +72,41 @@ router.get('/voiceContentInfo/:content_seq', function (req, res) {
       else{
         if(req.user != "undefined") {
           console.log("-----Voice ContentInfo Page Load-----")
-          res.render('voiceContentInfo', {title: "Temporary Title", data: result , sess: sessInfo});
+          res.render('voiceContentInfo', {title: "Voice ContentInfo", data: result , sess: sessInfo});
         }
         else {
           res.redirect("/login")
         }
       }
-
   })
 })
-router.get('/record/:account_id', function (req, res) {
-  let sessInfo = {};
-  let account_id = req.params.account_id;
 
+
+//컨텐츠 수정 및 삭제
+router.post('/ContentInfoUpdate/', function (req, res) {
+  let sessInfo = {};
   if (typeof req.user !== "undefined") {
     sessInfo = parseSession(req.user);
   }
+  console.log("Update start")
+  let {content_seq, title, content} = req.query;
+
+  console.log("param load")
+  console.log(req.body.content_seq)
+  console.log(title)
+
   //유저정보 불러오는 쿼리 사용
   //const sqlQuery="SELECT * FROM content_voice WHERE " 유저 테이블 생성 시 사용
   //임시 쿼리
-  sqlQuery="SELECT * FROM content_voice WHERE content_seq=?"
-  paramsSelect=[content_seq]
+  let sqlQuery="UPDATE content_voice SET (title, content) = (?,?) WHERER content_seq=?"
+  let paramsSelect = [title, content, content_seq];
   console.log(sqlQuery)
-  console.log(paramsSelect)
   conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
       if(err) throw err;
       else{
         if(req.user != "undefined") {
-          console.log("-----Voice ContentInfo Page Load-----")
-          res.render('voiceContentInfo', {title: "Temporary Title", data: result , sess: sessInfo});
+          console.log("-----Voice ContentInfo Update-----")
+          res.render('/', {sess: sessInfo});
         }
         else {
           res.redirect("/login")
@@ -109,20 +115,55 @@ router.get('/record/:account_id', function (req, res) {
 
   })
 })
+
+
+
+
+
+
+
+
 router.get('/record/:account_id', function (req, res) {
+  let sessInfo = {};
+  if (typeof req.user !== "undefined") {
+    sessInfo = parseSession(req.user);
+  }
+  let account_id = req.params.account_id;
+  //유저정보 불러오는 쿼리 사용
+  //const sqlQuery="SELECT * FROM content_voice WHERE " 유저 테이블 생성 시 사용
+  //임시 쿼리
+  // sqlQuery="SELECT * FROM content_voice WHERE content_seq=?"
+  // paramsSelect=[content_seq]
+  // console.log(sqlQuery)
+  // console.log(paramsSelect)
+  // conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
+  //     if(err) throw err;
+  //     else{
+  //       if(req.user != "undefined") {
+  //         console.log("-----Voice ContentInfo Page Load-----")
+  //         res.render('voiceContentInfo', {title: "Temporary Title", data: result , sess: sessInfo});
+  //       }
+  //       else {
+  //         res.redirect("/login")
+  //       }
+  //     }
 
-
-
-
+  // })
+  res.render('voiceRecord', {data: account_id , sess:sessInfo});
 
 
 })
+
 
 //데이터베이스 삽입
 router.get('/recordInsert', function (req, res) {
   //Get Parameter
   let {account_id, reporting_date, voice, title, content} = req.query
-
+  //session Setting
+  let sessInfo = {};
+  if (typeof req.user !== "undefined") {
+    sessInfo = parseSession(req.user);
+  }
   //Query setting
   let sqlQuery="INSERT INTO content_voice(account_id, title, content, voice, reporting_date) VALUE (?,?,?,?,?)"
   let paramsSelect = [account_id, title, content, voice, reporting_date];
@@ -134,7 +175,7 @@ router.get('/recordInsert', function (req, res) {
     console.log(results);
   });
   
-  res.render("/voiceContentList", {sess:sessInfo});
+  res.redirect("/voice");
 })
 
 

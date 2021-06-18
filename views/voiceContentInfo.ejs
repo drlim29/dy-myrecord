@@ -1,7 +1,7 @@
 
     <!-- Main Content -->
     <div id="content">
-        <form action="/recordDelete" name="voice_content" method="GET">
+        <form name="voice_content" method="POST">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
@@ -10,10 +10,10 @@
                         <% if(locals.data){ %>
                             <table>
                                 <tr>
-                                    <td>녹음 번호</td><td><input type="text" name="content_seq" value="<%= data[0].content_seq %>" class="list-group-item"/></td>
+                                    <td>녹음 번호</td><td><input disabled type="text" class="list-group-item" value="<%= data[0].content_seq %>"/></td>
                                 </tr>
                                 <tr>
-                                    <td>녹음</td><td><input type="text" name="account_id" class="list-group-item" value="<%= data[0].account_id %>"/></td>
+                                    <td>유저ID</td><td><input disabled type="text" class="list-group-item" value="<%= data[0].account_id %>"/></td>
                                 </tr>
                                 <tr>
                                     <td>제목</td><td><input type="text" name="title" class="list-group-item" value="<%= data[0].title %>"/></td>
@@ -22,10 +22,10 @@
                                     <td>내용</td><td><input type="text" name="content" class="list-group-item" value="<%= data[0].content %>"/></td>
                                 </tr>
                                 <tr>
-                                    <td>음성파일</td><td><input type="text" name="voice" class="list-group-item" value="<%= data[0].voice %>"/><audio src="">audio</audio></td>
+                                    <td>음성파일</td><td><input disabled type="text" class="list-group-item" value="<%= data[0].voice %>"/><audio src="">audio</audio></td>
                                 </tr>
                                 <tr>
-                                    <td>등록일</td><td><input type="text" name="reporting_date" class="list-group-item" value="<%= data[0].reporting_date %>"/></td>
+                                    <td>등록일</td><td><input disabled type="text"class="list-group-item" value="<%= data[0].reporting_date %>"/></td>
                                 </tr>
 
                             </table>
@@ -33,10 +33,14 @@
                     </ul>
                     </div>
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <input type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" value="삭제"></div>
+                        <input type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+                            name="content" value="수정하기" formaction="/voice/ContentInfoUpdate"/>           
+                        <input type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+                            name="content" value="삭제" formaction="/voice/ContentInfoDelete"/>
+                    </div>
+                        
                 </div>
-                </div>
-                </div>
+            </div>
         </form>    
 
     </div>

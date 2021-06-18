@@ -6,7 +6,7 @@
             <% if(locals.data){ 
                 for(let i=0;i<data.length;i++){ %>     
                     <li class="list-group-item">
-                        <a href="/voice/voiceContentInfo/4"> <%= data[i].title %> </a>
+                        <a href="/voice/voiceContentInfo/<%=data[i].content_seq%>"> <%= data[i].title %> </a>
                     <!--<a href="voiceContentInfo/<%=data[i].content_seq%>"> <%= data[i].title %> </a>  -->
                         <p><%= data[i].reporting_date%></p>
                         <div style="text-align:right;"><%= data[i].account_id %></div>
@@ -17,7 +17,7 @@
         </ul>
         <br/>
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <a href="/voice/record" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+            <a href="/voice/record/177254" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                     class="fas text-white-50"></i>목소리 녹음</a>
         </div>
         <div>
