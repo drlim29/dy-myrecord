@@ -22,7 +22,11 @@
                                     <td>내용</td><td><input type="text" name="content" class="list-group-item" value="<%= data[0].content %>"/></td>
                                 </tr>
                                 <tr>
-                                    <td>음성파일</td><td><input disabled type="text" class="list-group-item" value="<%= data[0].voice %>"/><audio src="">audio</audio></td>
+                                    <td>음성파일</td><td class="list-group-item audio" ><%= typeof(data[0].voice) %>
+                                        
+                                     <!--   <input disabled type="text" class="list-group-item" value="<%= data[0].voice %>"/><audio src="">audio</audio>-->
+                                    
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>등록일</td><td><input disabled type="text"class="list-group-item" value="<%= data[0].reporting_date %>"/></td>
@@ -42,5 +46,10 @@
                 </div>
             </div>
         </form>    
+        <script>
+            typeof(data[0].voice)
+            const objectURL = URL.createObjectURL(object)
+            const audioMain = document.getElementsByClassName("audio")
 
+        </script>
     </div>
