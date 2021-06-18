@@ -191,6 +191,8 @@ router.post('/edit/:id', function (req, res) {
 //세션 파싱
 function parseSession(sess)
 {
+  if (typeof sess === 'undefined' || sess.length === 0) return {};
+
     sessInfo = JSON.parse(JSON.stringify(sess));
     sessInfo = sessInfo[0];
     return sessInfo;
