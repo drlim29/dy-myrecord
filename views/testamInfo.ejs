@@ -9,7 +9,7 @@
     <p>로그인이 되어있지 않습니다.</p>
     <p>로그인 후 데이터를 가져올 수 있습니다.</p>
 <% } else {%>
-    <table border="1">
+    <!-- <table border="1">
         <colgroup>
             <col width="50px" />
             <col width="150px" />
@@ -22,74 +22,77 @@
             <td><%= row.content %></td>
         </tr>
         <% } %> 
-    </table>
-<%
-} %> 
-<div class="row">
-    <!-- Area Chart -->
-    <div class="col-xl-12 col-lg-4">
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div
-                class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
-                <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                        aria-labelledby="dropdownMenuLink">
-                        <div class="dropdown-header">Dropdown Header:</div>
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
-                <div class="chart-area">
-                    <canvas id="myAreaChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pie Chart -->
-    <div class="col-xl-4 col-lg-5">
-        
-        <form action="/ideas/sqlInsert" method="POST">
-            <div class="form-group">
-              <label for="title">Title</label>
-              <input type="text" class="form-control" name="title">
-            </div>
-            <div class="form-group">
-              <label for="title">Details</label>
-              <textarea class="form-control" name="content"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</submit>
-          </form>
-
-
-          <% if (ideas.length > 0) {%>
-            <h3 class="mb-3"> <%= user %>님의 유언</h3>
-            <% ideas.forEach(idea => {%>
-              <div class="card card-body mb-2" style="width:50%; box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important; border-radius: .35rem;">
+    </table> -->
+    
+    <!-- 유서 Chart -->
+    <div class="row" id="testamentView">
+    <% if (data.length > 0) {%>
+        <div class="col-12">
+            <h3 class="mb-3"> <%= sess.email %>님의 유서</h3>
+            <% data.forEach(idea => {%>
+                <div class="card card-body mb-2" style="width:50%; box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important; border-radius: .35rem;">
                 <h4><%= idea.title %></h4>
                 <p><%= idea.details %></p>
-                <a href="/ideas/edit/<%= idea._id %>" class="btn btn-dark btn-block shadow  mb-2" style="width: 20%; background-color: #0969c9; border: 0px;">수정</a>
-                <form method="post" action="ideas/<%= idea._id %>?_method=DELETE">
-                  <input type="hidden" name="_method" value="DELETE">
-                  <input type="submit" class="btn btn-danger btn-block" value="삭제" style="width: 20%; background-color: #0969c9;  border: 0px;">
+                <a href="/testam/edit/<%= idea._id %>" class="btn btn-dark btn-block shadow  mb-2" style="width: 20%; background-color: #0969c9; border: 0px;">수정</a>
+                <form method="post" action="testam/<%= idea._id %>?_method=DELETE">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="submit" class="btn btn-danger btn-block" value="삭제" style="width: 20%; background-color: #0969c9;  border: 0px;">
                 </form>
-              </div>
+                </div>
             <% }); %>
-          <% } else { %>
-            <p>No video ideas listed!</p>
-          <% } %>
-
-    </ul>
+    
+        </ul>
+        </div>
+    <% } else { %>
+        <div class="text-center" style="margin:100px auto;">
+            <h3>생성된 유서가 없습니다.</h3>
+            <button class="d-none d-lg-inline-block btn btn-lg btn-primary shadow-lg" id="btnCreateTestam"><i
+            class="fas fa-plus fa-lg text-white-50"></i> 유서작성하기</button>
+        </div>
+    <% } %>
     </div>
-</div>
+ 
+    <div id="testamentModify" style="display:none;">
+        <form action="/testam/sqlInsert" method="POST">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" name="title">
+            </div>
+            <div class="form-group">
+                <label for="title">Details</label>
+                <textarea class="form-control" name="content"></textarea>
+            </div>
+            <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id="btnViewTestament"><i
+                class="fas fa-plus fa-lg text-white-50"></i> 뒤로가기</button>
+            <button type="submit" class="btn btn-primary">저장하기</submit>        
+        </form>
+
+    </div>
+<%
+} %> 
+
+<script type="text/javascript">
+$(document).ready(function(){
+    //유서작성하기 버튼 클릭
+    $("#btnCreateTestam").click(function(){
+        viewModify();
+    });
+
+    //뒤로가기 버튼 클릭
+    $("#btnViewTestament").click(function(){
+        viewTestament();
+    });
+
+    //수정모드로 변경
+    function viewModify() {
+        $("#testamentView").hide();
+        $("#testamentModify").show();
+    }
+
+    //유서 보기
+    function viewTestament() {
+        $("#testamentView").show();
+        $("#testamentModify").hide();
+    }
+});
+</script>

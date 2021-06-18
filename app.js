@@ -201,6 +201,22 @@ app.get('/', (req, res) => {
   res.render('main', {sess:sessInfo});
 })
 
+app.get('/chart', (req, res) => {
+  const format = "%Y-%m-%e";
+  const sqlSelect = `SELECT DATE_FORMAT(create_date, '${format}') as date, count(*) as cnt FROM auth  GROUP BY DATE_FORMAT(create_date, '${format}') ORDER BY date DESC`;
+  console.log(sqlSelect, 'sqlSelect');
+  const paramsSelect = [];
+  return conn.query(sqlSelect, paramsSelect, (err, rows, authInfo) => {
+    console.log(rows, 'chart Count rows')
+    console.log(rows.length, 'rows.length---')
+      if (err) {
+          console.log(err, '로그인실패');
+          res.json({'result':false});
+      }
+
+      res.json({'result':true, 'data':rows});
+    });
+});
 
 // ì젙蹂´ 怨듭쑀 ë룞ì쓽 í뙘ì뾽
 app.post('/setAgree', (req, res) => {
