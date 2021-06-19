@@ -1,3 +1,5 @@
+
+
 <div class="container">
     <div class="row">
         <div class="col-12">
@@ -8,8 +10,12 @@
                     <li class="list-group-item">
                         <a href="/voice/voiceContentInfo/<%=data[i].content_seq%>"> <%= data[i].title %> </a>
                     <!--<a href="voiceContentInfo/<%=data[i].content_seq%>"> <%= data[i].title %> </a>  -->
-                        <p><%= data[i].reporting_date%></p>
-                        <div style="text-align:right;"><%= data[i].account_id %></div>
+                        <% 
+                        var curDate = data[i].reporting_date;
+                        var reporting_date = curDate.getFullYear() + "-" + (curDate.getMonth() + 1) + "-" + curDate.getDate()
+                        %>
+                        <p>작성일 : <%= reporting_date%></p>
+                        <div style="text-align:right;">작성자 : <%= sess['email']%></div>
                     
                     </li>
                 <% } %>
@@ -19,17 +25,6 @@
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <a href="/voice/record/177254" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                     class="fas text-white-50"></i>목소리 녹음</a>
-        </div>
-        <div>
-            Pageing<br/>
-            <a href="#"><span>1</span></a>
-            <a href="#"><span>2</span></a>
-            <a href="#"><span>3</span></a>
-            <a href="#"><span>4</span></a>
-            <a href="#"><span>5</span></a>
-            <a href="#"><span>6</span></a>
-            <a href="#"><span>7</span></a>
-            <a href="#"><span>8</span></a>
         </div>
         <br/>   
     </div>

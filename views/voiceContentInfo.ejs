@@ -1,7 +1,10 @@
-
+    <% 
+        var curDate = data[0].reporting_date;
+        var reporting_date = curDate.getFullYear() + "-" + (curDate.getMonth() + 1) + "-" + curDate.getDate()
+    %>
     <!-- Main Content -->
     <div id="content">
-        <form name="voice_content" method="POST">
+        <form  name="voice_content" method="get">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
@@ -10,10 +13,13 @@
                         <% if(locals.data){ %>
                             <table>
                                 <tr>
-                                    <td>녹음 번호</td><td><input disabled type="text" class="list-group-item" value="<%= data[0].content_seq %>"/></td>
+                                    <td>녹음 번호</td><td><input readonly type="text" class="list-group-item" name="content_seq" value="<%= data[0].content_seq %>"/></td>
                                 </tr>
                                 <tr>
-                                    <td>유저ID</td><td><input disabled type="text" class="list-group-item" value="<%= data[0].account_id %>"/></td>
+                                    <td>작성자</td>
+                                    <td><input  type="text" class="list-group-item" value="<%= data[0].account_seq %>"/>
+                                        <input readonly type="text" class="list-group-item" value="<%= sess['email'] %>"/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>제목</td><td><input type="text" name="title" class="list-group-item" value="<%= data[0].title %>"/></td>
@@ -22,34 +28,43 @@
                                     <td>내용</td><td><input type="text" name="content" class="list-group-item" value="<%= data[0].content %>"/></td>
                                 </tr>
                                 <tr>
-                                    <td>음성파일</td><td class="list-group-item audio" ><%= typeof(data[0].voice) %>
+                                    <td>음성파일</td><audio class="list-group-item audio" value="<%= typeof(data[0].voice) %>" ><%= typeof(data[0].voice) %>  </audio>
                                         
                                      <!--   <input disabled type="text" class="list-group-item" value="<%= data[0].voice %>"/><audio src="">audio</audio>-->
                                     
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>등록일</td><td><input disabled type="text"class="list-group-item" value="<%= data[0].reporting_date %>"/></td>
+                                    <td>등록일</td><td><input readonly type="text"class="list-group-item" value="<%= reporting_date %>"/></td>
                                 </tr>
-
                             </table>
                         <% } %>
                     </ul>
                     </div>
+
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <input type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
-                            name="content" value="수정하기" formaction="/voice/ContentInfoUpdate"/>           
+                            name="actionURL" value="수정하기" formaction="/voice/ContentInfoUpdate"/>&nbsp        
                         <input type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
-                            name="content" value="삭제" formaction="/voice/ContentInfoDelete"/>
+                            name="actionURL" value="삭제" formaction="/voice/ContentInfoDelete/<%= data[0].content_seq %>"/>
                     </div>
-                        
+
                 </div>
             </div>
         </form>    
         <script>
-            typeof(data[0].voice)
-            const objectURL = URL.createObjectURL(object)
-            const audioMain = document.getElementsByClassName("audio")
+            
+            window.onload = function(){
+                alert("2nd window onload")
+                const soundClips = document.getElementsByClassName("audio")
+                const objectURL = URL.createObjectURL(soundClips.getAttribute("value"))
+
+
+                const audio = document.createElement('audio')
+
+                audio.src = objectURL
+            }
+
 
         </script>
     </div>

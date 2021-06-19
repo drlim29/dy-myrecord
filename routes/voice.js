@@ -13,32 +13,17 @@ router.get('/', function (req, res) {
   if (typeof req.user !== "undefined") {
     sessInfo = parseSession(req.user);
   }
-  let sqlQuery="SELECT * FROM content_voice;" //WHERE account_id=?
-  paramsSelect=[req.user]
+  
+  let sqlQuery="SELECT * FROM content_voice WHERE account_seq=?;"
+  paramsSelect=[sessInfo.account_id]
+  
   conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
-    /*
-    if(err) throw err;
-    else{
-      console.log("else")
-        if(req.user != "undefined") {
-          var page = res.render('voiceContentList', {
-              sess: sessInfo,
-              data: result,
-          });
-          console.log("--Voice Content Page Load")
-          res.render(page);
-        }
-       
-        else {
-          res.redirect("/login")
-        }
-    }*/
-    if(req.user != "undefined") {
+    if(sessInfo.account_id !== undefined) {
       console.log("-----Voice ContentList Page Load-----")
       res.render('voiceContentList', {sess: sessInfo, data: result});
     }
     else {
-      res.redirect("/login",  {sess: sessInfo})
+      res.render("login",{sess: sessInfo})
     }
 });
 /*
@@ -75,41 +60,67 @@ router.get('/voiceContentInfo/:content_seq', function (req, res) {
           res.render('voiceContentInfo', {title: "Voice ContentInfo", data: result , sess: sessInfo});
         }
         else {
-          res.redirect("/login")
+          res.redirect("/voice");
         }
       }
   })
 })
 
 
-//컨텐츠 수정 및 삭제
-router.post('/ContentInfoUpdate/', function (req, res) {
+//컨텐츠 수정
+router.get('/ContentInfoUpdate/', function (req, res) {
+  //Get Parameter
+  let {content_seq, title, content} = req.query
+  //Get Session
   let sessInfo = {};
   if (typeof req.user !== "undefined") {
     sessInfo = parseSession(req.user);
-  }
-  console.log("Update start")
-  let {content_seq, title, content} = req.query;
+  }  
 
-  console.log("param load")
-  console.log(req.body.content_seq)
-  console.log(title)
-
-  //유저정보 불러오는 쿼리 사용
-  //const sqlQuery="SELECT * FROM content_voice WHERE " 유저 테이블 생성 시 사용
-  //임시 쿼리
-  let sqlQuery="UPDATE content_voice SET (title, content) = (?,?) WHERER content_seq=?"
+  //Query setting
+  let sqlQuery="UPDATE content_voice SET title=?, content=? WHERE content_seq=?"
+  //Parameter setting
   let paramsSelect = [title, content, content_seq];
+
   console.log(sqlQuery)
   conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
       if(err) throw err;
       else{
         if(req.user != "undefined") {
           console.log("-----Voice ContentInfo Update-----")
-          res.render('/', {sess: sessInfo});
+          res.redirect("/voice");
         }
         else {
-          res.redirect("/login")
+          res.redirect("/voice");
+        }
+      }
+  })
+});
+
+//컨텐츠 삭제
+router.post('/ContentInfoDelete/:content_seq', function (req, res) {
+  let sessInfo = {};
+  if (typeof req.user !== "undefined") {
+    sessInfo = parseSession(req.user);
+  }
+  let content_seq = req.params.content_seq;
+
+
+  //Query setting
+  let sqlQuery="DELETE FROM content_voice WHERE content_seq=?"
+  //Parameter setting
+  let paramsSelect = [content_seq];
+  console.log(sqlQuery)
+  conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
+      if(err) throw err;
+      else{
+        if(req.user != "undefined") {
+          console.log("-----Voice Content delete-----")
+          res.redirect("/voice");
+        }
+        else {
+          alert("오류가 발생했습니다.")
+          res.redirect("/voice")
         }
       }
 
@@ -118,17 +129,13 @@ router.post('/ContentInfoUpdate/', function (req, res) {
 
 
 
-
-
-
-
-
-router.get('/record/:account_id', function (req, res) {
+//컨텐츠 생성페이지
+router.get('/record/:account_seq', function (req, res) {
   let sessInfo = {};
   if (typeof req.user !== "undefined") {
     sessInfo = parseSession(req.user);
   }
-  let account_id = req.params.account_id;
+  let account_seq = req.params.account_seq;
   //유저정보 불러오는 쿼리 사용
   //const sqlQuery="SELECT * FROM content_voice WHERE " 유저 테이블 생성 시 사용
   //임시 쿼리
@@ -149,7 +156,9 @@ router.get('/record/:account_id', function (req, res) {
   //     }
 
   // })
-  res.render('voiceRecord', {data: account_id , sess:sessInfo});
+
+
+  res.render('voiceRecord', {data: account_seq , sess:sessInfo});
 
 
 })
@@ -158,15 +167,25 @@ router.get('/record/:account_id', function (req, res) {
 //데이터베이스 삽입
 router.get('/recordInsert', function (req, res) {
   //Get Parameter
-  let {account_id, reporting_date, voice, title, content} = req.query
+  let {account_seq, voice, title, content} = req.query
   //session Setting
   let sessInfo = {};
   if (typeof req.user !== "undefined") {
     sessInfo = parseSession(req.user);
   }
+
+  //입력시간
+  let today = new Date()
+  let year = today.getFullYear(); // 년도
+  let month = today.getMonth() + 1;  // 월
+  let date = today.getDate()
+  let reporting_date=year + '/' + month + '/' + date
+  console.log("Now date : "+reporting_date)
+
+
   //Query setting
-  let sqlQuery="INSERT INTO content_voice(account_id, title, content, voice, reporting_date) VALUE (?,?,?,?,?)"
-  let paramsSelect = [account_id, title, content, voice, reporting_date];
+  let sqlQuery="INSERT INTO content_voice(account_seq, title, content, voice, reporting_date) VALUE (?,?,?,?,?)"
+  let paramsSelect = [account_seq, title, content, voice, reporting_date];
   
   conn.query(sqlQuery, paramsSelect, (error, results, fields) => {
     if (error) {
@@ -176,16 +195,6 @@ router.get('/recordInsert', function (req, res) {
   });
   
   res.redirect("/voice");
-})
-
-
-
-router.get('/edit/:id', function (req, res) {
-
-})
-
-router.post('/edit/:id', function (req, res) {
-
 })
 
 //세션 파싱
@@ -199,99 +208,3 @@ function parseSession(sess)
 }
 
 module.exports = router;
-
-/*
-
-
-app.get('/record', (req, res) => {
-  let sessInfo = {};
-  
-  res.render('voiceRecord');
-})
-
-app.get('/recordInsert', (req, res) => {
-  //Get Parameter
-  let {account_id, reporting_date, voice, title, content} = req.query
-  console.log(req.query)
-  //Query setting
-  let sqlQuery="INSERT INTO content_voice(account_id, title, content, voice, reporting_date) VALUE (?,?,?,?,?)"
-  let paramsSelect = [account_id, title, content, voice, reporting_date];
-  
-  conn.query(sqlQuery, paramsSelect, (error, results, fields) => {
-    if (error) {
-      console.log(error);
-    }
-    console.log(results);
-  });
-  
-  res.redirect("/voiceContentList");
-})
-
-//완료
-app.get('/recordDelete', (req, res) => {
-  //파라메타 값 읽기
-  let {content_seq} = req.query
-  //Query setting
-  let sqlQuery="DELETE FROM content_voice WHERE content_seq="+content_seq;
-  //Query start
-  conn.query(sqlQuery, function (error, results, fields) {
-    if (error) {
-      console.log(error);
-    }
-    console.log(results);
-  });
-  //redirect to voiceContentList page
-  res.redirect("/voiceContentList");
-})
-
-
-app.get('/voiceContentList', (req, res) => {
-  //Query setting
-  let sqlQuery="SELECT * FROM content_voice WHERE account_id=?"
-  //let paramsSelect = [req.user];
-  //테스트용
-  let paramsSelect=[1760576225];
-  
-  conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
-  let sessInfo = {};
-  if (typeof req.user !== "undefined") {
-    sessInfo = parseSession(req.user);
-  }
-  
-      if(err) throw err;
-      else{
-          if(req.user != "undefined") {
-            var page = res.render('voiceContentList', {
-                title: "Temporary Title",
-                data: result,
-            });
-            console.log("--Voice Content Page Load")
-            res.end(page);
-          }
-          else {
-            res.redirect("/login")
-          }
-      }
-  });
-});
-
-app.get('/voiceContentInfo', (req, res) => {
-  let {voiceContentID} = req.query;
-  let sqlQuery = "SELECT * FROM content_voice WHERE content_seq="+voiceContentID+";";
-  console.log(sqlQuery);
-  conn.query(sqlQuery, function(err, result, fields){
-    if(err) throw err;
-    else{
-      console.log(result[0].content);
-      var page = res.render('voiceContentInfo', {
-          title: "Temporary Title",
-          data: result,
-      });
-      res.end(page);
-    }
-  });
-});
-
-
-
-*/

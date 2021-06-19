@@ -10,8 +10,7 @@
         <form action="/voice/recordInsert" name="voice_content" method="GET">
             <table>
             <input type="text" id="account_id" hidden/>        
-            <tr><td>작성자</td>   <td><input disable type="text" name="account_id" value="1760576225"/><%=data[0].account_id %></td></tr>
-            <tr><td>작성일시</td> <td><input type="text" name="reporting_date" value="2021-06-09"/> </td></tr>
+            <tr><td>작성자</td>   <td><input readonly type="text" name="account_id" value="<%= sess['account_id']%>"/></td></tr>
             <tr><td>제목</td>     <td><input type="text" name="title" value="test" /></td></tr>
             <tr><td>내용</td>     <td><input type="text" name="content" value="test" /></td></tr>
             <tr><td>음성파일</td> <td>
@@ -33,28 +32,19 @@
 </div>
 
 <script>
+    //MediaRecorder API - 녹음을 위한 선언
     const record = document.getElementById("record")
     const stop = document.getElementById("stop")
     const soundClips = document.getElementById("sound-clips")
     const chkHearMic = document.getElementById("chk-hear-mic")
 
     const audioCtx = new(window.AudioContext || window.webkitAudioContext)() // 오디오 컨텍스트 정의
-
     const analyser = audioCtx.createAnalyser()
-    //        const distortion = audioCtx.createWaveShaper()
-    //        const gainNode = audioCtx.createGain()
-    //        const biquadFilter = audioCtx.createBiquadFilter()
 
     function makeSound(stream) {
         const source = audioCtx.createMediaStreamSource(stream)
-
         source.connect(analyser)
-        //            analyser.connect(distortion)
-        //            distortion.connect(biquadFilter)
-        //            biquadFilter.connect(gainNode)
-        //            gainNode.connect(audioCtx.destination) // connecting the different audio graph nodes together
         analyser.connect(audioCtx.destination)
-
     }
 
     if (navigator.mediaDevices) {
@@ -77,8 +67,7 @@
                     } else {
                         audioCtx.suspend()
                     }
-                }
-                
+                }    
                 record.onclick = () => {
                     
                     if(document.getElementsByTagName('article').length !=0) {
@@ -119,6 +108,7 @@
                     clipContainer.appendChild(deleteButton)
                     blobData.type='text'
                     blobData.name='voice'
+                    blobData.type='hidden'
                     
                     soundClips.appendChild(clipContainer)
 
@@ -137,12 +127,6 @@
                     chunks = []
                     const audioURL = URL.createObjectURL(blob)
                     audio.src = audioURL
-                    console.log(blob)
-                    console.log("blob size")
-                    console.log(blob.size)
-                    console.log("blob type")
-                    console.log(blob.type)
-                    console.log("recorder stopped")
 
                     deleteButton.onclick = e => {
                         evtTgt = e.target
