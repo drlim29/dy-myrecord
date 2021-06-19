@@ -15,10 +15,10 @@ router.get('/', function (req, res) {
   }
   
   let sqlQuery="SELECT * FROM content_voice WHERE account_seq=?;"
-  paramsSelect=[sessInfo.account_id]
+  paramsSelect=[sessInfo.account_seq]
   
   conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
-    if(sessInfo.account_id !== undefined) {
+    if(sessInfo.account_seq !== undefined) {
       console.log("-----Voice ContentList Page Load-----")
       res.render('voiceContentList', {sess: sessInfo, data: result});
     }
