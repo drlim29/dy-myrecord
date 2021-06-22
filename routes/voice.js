@@ -96,8 +96,8 @@ router.get('/voiceContentInfo/:content_seq', function (req, res) {
 
 
 //컨텐츠 수정
-router.get('/ContentInfoUpdate/', function (req, res) {
-  let {content_seq, title, content} = req.query
+router.post('/ContentInfoUpdate/', function (req, res) {
+  let {content_seq, title, content} = req.body
   let sessInfo = {};
   
   //사용자 고유값 읽기
@@ -124,8 +124,8 @@ router.get('/ContentInfoUpdate/', function (req, res) {
 });
 
 //컨텐츠 삭제
-router.get('/ContentInfoDelete/:content_seq', function (req, res) {
-  let {content_seq} = req.query;
+router.post('/ContentInfoDelete/:content_seq', function (req, res) {
+  let {content_seq} = req.body;
   let sessInfo = {};
 
   //사용자 고유값 읽기
@@ -136,6 +136,8 @@ router.get('/ContentInfoDelete/:content_seq', function (req, res) {
   //Query & Parameter setting
   let sqlQuery="DELETE FROM content_voice WHERE content_seq=?"
   let paramsSelect = [content_seq];
+console.log(sqlQuery, 'sqlQuery - delte');
+console.log(paramsSelect, 'paramsSelect - delte');
   //Query
   conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
       if(err) throw err;
