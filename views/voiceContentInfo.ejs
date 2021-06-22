@@ -17,7 +17,7 @@
                                 </tr>
                                 <tr>
                                     <td>작성자</td>
-                                    <td><input  type="text" class="list-group-item" value="<%= data[0].account_seq %>"/>
+                                    <td><input hidden type="text" class="list-group-item" value="<%= data[0].account_id %>"/>
                                         <input readonly type="text" class="list-group-item" value="<%= sess['email'] %>"/>
                                     </td>
                                 </tr>
@@ -28,20 +28,20 @@
                                     <td>내용</td><td><input type="text" name="content" class="list-group-item" value="<%= data[0].content %>"/></td>
                                 </tr>
                                 <tr>
-                                    <td>음성파일</td><audio class="list-group-item audio" value="<%= typeof(data[0].voice) %>" ><%= typeof(data[0].voice) %>  </audio>
                                         
-                                     <!--   <input disabled type="text" class="list-group-item" value="<%= data[0].voice %>"/><audio src="">audio</audio>-->
+                                    <td>음성파일</td><td>
+                                     <input hidden type="text" class="list-group-item" name="audioSrc" value="<%= data[0].voice %>"/>
+                                     <div id="sound-clips"></div>
                                     
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>등록일</td><td><input readonly type="text"class="list-group-item" value="<%= reporting_date %>"/></td>
+                                    <td>등록일</td><td><input readonly type="text" class="list-group-item" value="<%= reporting_date %>"/></td>
                                 </tr>
                             </table>
                         <% } %>
                     </ul>
                     </div>
-
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <input type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
                             name="actionURL" value="수정하기" formaction="/voice/ContentInfoUpdate"/>&nbsp        
@@ -53,18 +53,43 @@
             </div>
         </form>    
         <script>
-            
+            //선언
+            const audioDiv = document.getElementById("sound-clips")
+
+            //페이지 onload이벤트
             window.onload = function(){
-                alert("2nd window onload")
-                const soundClips = document.getElementsByClassName("audio")
-                const objectURL = URL.createObjectURL(soundClips.getAttribute("value"))
-
-
+                //DB에서 추출한 blob 데이터 값 가져오기
+                let soundClips = document.getElementsByName("audioSrc")
+                //blob 데이터 가공
+                var blob = new Blob([soundClips.value], {
+                        'type': 'audio/ogg codecs=opus'
+                    });
+                //blob 사용을 위해 URL 생성
+                let objectURL = URL.createObjectURL(blob)
+                
                 const audio = document.createElement('audio')
-
                 audio.src = objectURL
-            }
+                const clipContainer = document.createElement('article')
+                const clipLabel = document.createElement('p')
+                const blobData= document.createElement('input')
 
+                clipContainer.classList.add('clip')
+                audio.setAttribute('controls', 'true')
+                audio.controls = true
+                clipContainer.appendChild(audio)
+                clipContainer.appendChild(blobData)
+                clipContainer.appendChild(clipLabel)
+                blobData.type='file'
+                blobData.name='voice'
+                blobData.type='hidden'
+                
+                audioDiv.appendChild(clipContainer)
+
+                chunks = []
+                const audioURL = URL.createObjectURL(blob)
+                audio.src = audioURL
+            }
+                
 
         </script>
     </div>

@@ -1,22 +1,17 @@
-
-
 <div class="container">
     <div class="row">
         <div class="col-12">
-        <h1>Voice Record</h1>
+        <h1>녹음 목록</h1>
         <ul class="list-group">
             <% if(locals.data){ 
-                for(let i=0;i<data.length;i++){ %>     
+                for(let i=0;i<data.length;i++){ 
+                    var curDate = data[i].reporting_date;
+                    var reporting_date = curDate.getFullYear() + "-" + (curDate.getMonth() + 1) + "-" + curDate.getDate();
+                    %>     
                     <li class="list-group-item">
                         <a href="/voice/voiceContentInfo/<%=data[i].content_seq%>"> <%= data[i].title %> </a>
-                    <!--<a href="voiceContentInfo/<%=data[i].content_seq%>"> <%= data[i].title %> </a>  -->
-                        <% 
-                        var curDate = data[i].reporting_date;
-                        var reporting_date = curDate.getFullYear() + "-" + (curDate.getMonth() + 1) + "-" + curDate.getDate()
-                        %>
                         <p>작성일 : <%= reporting_date%></p>
                         <div style="text-align:right;">작성자 : <%= sess['email']%></div>
-                    
                     </li>
                 <% } %>
             <% } %>

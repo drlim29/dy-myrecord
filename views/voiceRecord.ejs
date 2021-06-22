@@ -1,52 +1,55 @@
-
 <div class="col-lg-6 mb-4">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">녹음</h6>
+        </div>
+        <div class="card-body">
+            <form action="/voice/recordInsert" name="voice_content" method="GET">
+                <table>
+                <input type="text" id="account_seq" value="sess['account_id']" hidden/>        
+                <tr><td>작성자</td>   <td><input readonly class="list-group-item" type="text" name="email" value="<%= sess['email']%>"/></td></tr>
+                <tr><td>제목</td>     <td><input class="list-group-item" type="text" name="title" id="title" value="" /></td></tr>
+                <tr><td>내용</td>     <td><input class="list-group-item" type="text" name="content" id="content" value="" /></td></tr>
+                <tr><td rowspan="2">음성파일</td> 
+                    <td class="list-group-item">
+                        <button type="button" id="record">녹음</button>
+                        <button type="button" id="stop">정지</button><br/><br/>
+                        <input type="checkbox" id="chk-hear-mic"><label for="chk-hear-mic">마이크 소리 듣기</label>
+                        
+                        <div id="sound-clips"></div></td>
+                    </td>
+                </tr>
+                <div id="sound-clips"></div>
+                </table>
+                <input type="submit" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm submit"></a>
 
-<!-- Illustrations -->
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">녹음</h6>
-    </div>
-    <div class="card-body">
-        <form action="/voice/recordInsert" name="voice_content" method="GET">
-            <table>
-            <input type="text" id="account_id" hidden/>        
-            <tr><td>작성자</td>   <td><input readonly type="text" name="account_id" value="<%= sess['account_id']%>"/></td></tr>
-            <tr><td>제목</td>     <td><input type="text" name="title" value="test" /></td></tr>
-            <tr><td>내용</td>     <td><input type="text" name="content" value="test" /></td></tr>
-            <tr><td>음성파일</td> <td>
-                <input type="checkbox" id="chk-hear-mic"><label for="chk-hear-mic">마이크 소리 듣기</label>
-            <button type="button" id="record">녹음</button>
-            <button type="button" id="stop">정지</button>
-                <div id="sound-clips"></div></td></tr>
-            <div id="sound-clips"></div>
-            </table>
-            <button type="submit">제출</button>
-        </form>
-        
-        <br/>
-        <br/>
-        <br/>
-        <br/>
+            </form>
+        </div>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
 
     </div>
 </div>
 
 <script>
-    //MediaRecorder API - 녹음을 위한 선언
+    
     const record = document.getElementById("record")
     const stop = document.getElementById("stop")
     const soundClips = document.getElementById("sound-clips")
     const chkHearMic = document.getElementById("chk-hear-mic")
-
-    const audioCtx = new(window.AudioContext || window.webkitAudioContext)() // 오디오 컨텍스트 정의
+    // 오디오 컨텍스트 정의
+    const audioCtx = new(window.AudioContext || window.webkitAudioContext)() 
     const analyser = audioCtx.createAnalyser()
-
+    
     function makeSound(stream) {
         const source = audioCtx.createMediaStreamSource(stream)
         source.connect(analyser)
         analyser.connect(audioCtx.destination)
-    }
 
+    }
+    
     if (navigator.mediaDevices) {
         console.log('getUserMedia supported.')
 
@@ -54,12 +57,14 @@
             audio: true
         }
         let chunks = []
-
+        
+        
         navigator.mediaDevices.getUserMedia(constraints)
             .then(stream => {
                 //MediaRecorder API 사용
                 const mediaRecorder = new MediaRecorder(stream)
                 
+                //사운드 스트림 생성
                 chkHearMic.onchange = e => {
                     if(e.target.checked == true) {
                         audioCtx.resume()
@@ -67,9 +72,9 @@
                     } else {
                         audioCtx.suspend()
                     }
-                }    
+                }
+                //녹음 시작
                 record.onclick = () => {
-                    
                     if(document.getElementsByTagName('article').length !=0) {
                         alert("녹음된 목소리가 존재합니다. 다시 녹음하고싶으신 경우 기존의 녹음된 파일을 삭제하여 주십시오.")
                         return
@@ -80,7 +85,7 @@
                     record.style.background = "red"
                     record.style.color = "black"
                 }
-
+                //녹음 정지
                 stop.onclick = () => {
                     mediaRecorder.stop()
                     console.log(mediaRecorder.state)
@@ -88,10 +93,11 @@
                     record.style.background = ""
                     record.style.color = ""
                 }
-
+                
+                //녹음 완료시
                 mediaRecorder.onstop = e => {
                     console.log("data available after MediaRecorder.stop() called.")
-
+                    //태그 설정
                     const clipContainer = document.createElement('article')
                     const clipLabel = document.createElement('p')
                     const audio = document.createElement('audio')
@@ -106,14 +112,15 @@
                     clipContainer.appendChild(blobData)
                     clipContainer.appendChild(clipLabel)
                     clipContainer.appendChild(deleteButton)
-                    blobData.type='text'
+                    blobData.type='file'
                     blobData.name='voice'
                     blobData.type='hidden'
                     
                     soundClips.appendChild(clipContainer)
 
+                    //녹음된 오디오를 blob 형식으로 생성
                     audio.controls = true
-                    const blob = new Blob(chunks, {
+                    blob = new Blob(chunks, {
                         'type': 'audio/ogg codecs=opus'
                     })
                     const formData = new FormData()
@@ -128,10 +135,12 @@
                     const audioURL = URL.createObjectURL(blob)
                     audio.src = audioURL
 
+                    reader.readAsArrayBuffer(blob)
+
                     deleteButton.onclick = e => {
                         evtTgt = e.target
                         evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode)
-                    }
+                    }   
                 }
 
                 mediaRecorder.ondataavailable = e => {
@@ -142,4 +151,6 @@
                 console.log('The following error occurred: ' + err)
             })
     }
+
+ 
 </script>
