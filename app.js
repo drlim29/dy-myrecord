@@ -243,7 +243,7 @@ app.post('/setAgree', (req, res) => {
 
 // login
 // app.get('/login', (req, res)=> {
-//   res.render('login.ejs');
+//   res.render('auth/login.ejs');
 // });
 
 // testament

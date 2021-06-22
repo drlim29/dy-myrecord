@@ -24,19 +24,19 @@ router.get('/', function (req, res) {
   conn.query(sqlQuery, paramsSelect, (err, result, fields) => {
     if(sessInfo.account_id !== undefined) {
       console.log("-----Voice ContentList Page Load-----")
-      res.render('voiceContentList', {sess: sessInfo, data: result});
+      res.render('voice/voiceContentList', {sess: sessInfo, data: result});
     }
     else {
-      res.render("login",{sess: sessInfo})
+      res.render("auth/login",{sess: sessInfo})
     }
   });
 
 })
 
 //데이터베이스 삽입
-router.get('/recordInsert', function (req, res) {
-  let {voice, title, content} = req.query
-
+router.post('/recordInsert', function (req, res) {
+  let {voice, title, content} = req.body
+  
   //사용자 고유값 읽기
   let sessInfo = {};
   if (typeof req.user !== "undefined") {
@@ -49,17 +49,20 @@ router.get('/recordInsert', function (req, res) {
   let month = today.getMonth() + 1;                       // 월
   let date = today.getDate()
   let reporting_date=year + '/' + month + '/' + date
-
+  
   //Query setting
   let sqlQuery="INSERT INTO content_voice(account_seq, title, content, voice, reporting_date) VALUE (?,?,?,?,?)"
-  let paramsSelect = [sessInfo.account_id, title, content, voice, reporting_date];
+  let paramsSelect = [sessInfo.account_id, title, content, voice ?? '', reporting_date];
+
   //Query
   conn.query(sqlQuery, paramsSelect, (err, results, fields) => {
-    if (error) {
+
+    if (err) {
       console.log("-----Voice Content insert-----")
     }
     console.log("-----Voice Content insert: Failed-----")
   });
+
   res.redirect("/voice");
 })
 
@@ -81,7 +84,7 @@ router.get('/voiceContentInfo/:content_seq', function (req, res) {
       else{
         if(req.user != "undefined") {
           console.log("-----Voice ContentInfo Page Load-----")
-          res.render('voiceContentInfo', {title: "Voice ContentInfo", data: result , sess: sessInfo});
+          res.render('voice/voiceContentInfo', {title: "Voice ContentInfo", data: result , sess: sessInfo});
         }
         else {
           console.log("-----Voice ContentInfo Page Load: Failed-----")
@@ -160,7 +163,7 @@ router.get('/record/:account_seq', function (req, res) {
     sessInfo = parseSession(req.user);                    
   }
   let account_seq = req.params.account_seq;
-  res.render('voiceRecord', {data: account_seq , sess:sessInfo});
+  res.render('voice/voiceRecord', {data: account_seq , sess:sessInfo});
 })
 
 

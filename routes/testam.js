@@ -20,18 +20,23 @@ router.get('/', function (req, res) {
   const sqlSelect = 'SELECT * FROM testament WHERE account_seq = ?';
   const paramsSelect = [sessInfo.account_seq];  //세션에서 가져온 account_seq값
   
-  //쿼리실행
-  conn.query(sqlSelect, paramsSelect, (err, rows, testamInfo) => { //callback함수 (쿼리 실행 뒤에 실행 프로세스)
-    console.log(rows, 'rows');
+  if(sessInfo.account_id !== undefined) {
+    //쿼리실행
+    conn.query(sqlSelect, paramsSelect, (err, rows, testamInfo) => { //callback함수 (쿼리 실행 뒤에 실행 프로세스)
+      console.log(rows, 'rows');
 
-    if (err) {
-        console.log(err, 'Select 실패');
-        return done(err);
-    }
+      if (err) {
+          console.log(err, 'Select 실패');
+          return done(err);
+      }
 
-    //가져온 데이터로 render
-    res.render('testamInfo', {sess:sessInfo, data : rows});
-  });
+      //가져온 데이터로 render
+      res.render('testament/testamInfo', {sess:sessInfo, data : rows});
+    });
+  }
+  else {
+    res.render("auth/login",{sess: sessInfo})
+  }
 })
 
 //Insert등록
