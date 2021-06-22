@@ -1836,7 +1836,8 @@ pre code {
   color: #6e707e;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid #d1d3e2;
+  /* border: 1px solid #d1d3e2; */
+  border: 0px;
   border-radius: 0.35rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -2305,6 +2306,15 @@ textarea.form-control {
   .form-inline .custom-control-label {
     margin-bottom: 0;
   }
+}
+
+.testam-btn > button {
+  padding: 10px 30px;
+  border: 0px;
+  background: linear-gradient(to top, #244bbf, #7368cc);
+  border-radius: 50px;
+  width: 125px;
+  height: 45px;
 }
 
 .btn {
