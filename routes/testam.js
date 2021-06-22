@@ -1,6 +1,7 @@
 // ./routes/auth.js
 const express = require('express');
 const router = express.Router();
+const moment  = require('moment');
 
 //db
 const path = require('path');
@@ -22,7 +23,6 @@ router.get('/', function (req, res) {
   //쿼리실행
   conn.query(sqlSelect, paramsSelect, (err, rows, testamInfo) => { //callback함수 (쿼리 실행 뒤에 실행 프로세스)
     console.log(rows, 'rows');
-    // console.log(testamentInfo, 'testamentInfo');
 
     if (err) {
         console.log(err, 'Select 실패');
@@ -32,66 +32,60 @@ router.get('/', function (req, res) {
     //가져온 데이터로 render
     res.render('testamInfo', {sess:sessInfo, data : rows});
   });
-  // res.render('testamInfo.ejs');
 })
 
-//insert등록
+//Insert등록
 router.post('/sqlInsert', function (req, res) {
+  console.log('---------------------------');
+  console.log(req.body, 'req.body.');
 
   let sessInfo = {};
+  
   if (typeof req.user !== "undefined") {
     sessInfo = parseSession(req.user);
   }
+  console.log(sessInfo, 'sessInfo');
 
-  //Insert Query
-  const sqlInsert = 'INSERT INTO testament(account_id, title, content, date) VALUE (?,?,?,?)';
-  const paramsSelect = [sessInfo.account_seq];  //세션에서 가져온 account_seq값
-  
+  //Update - DUPLICATE KEY UPDATE
+  const sqlUpsert = 'INSERT INTO testament(account_seq, title, content, date) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE  title = ?, content = ?, date = ?';
+  const paramsUpsert = [sessInfo.account_seq, req.body.title, req.body.content, moment().format('YYYY-MM-DD'),  req.body.title, req.body.content, moment().format('YYYY-MM-DD')];  //세션에서 가져온 account_seq값
   //쿼리실행
-  conn.query(sqlInsert, paramsSelect, (err, rows, fields) => { //callback함수 (쿼리 실행 뒤에 실행 프로세스)
-    console.log(rows, 'rows');
-    // console.log(testamentInfo, 'testamentInfo');
+   conn.query(sqlUpsert, paramsUpsert, (err, rows, fields) => { //callback함수 (쿼리 실행 뒤에 실행 프로세스)
+     console.log(rows, 'rows');
 
-    if (err) {
-        console.log(err, 'insert 실패');
-        return done(err);
-    }
+     if (err) {
+         console.log(err, 'insert 실패');
+         return done(err);
+     }
+    //가져온 데이터로 render
+    res.redirect('/testam');
+   });
+
+  
+})
+
+
+//Delete
+router.post('/delete', (req, res) => {
+  const sqlDelete = 'DELETE FROM testament WHERE account_seq = ?';
+  const paramsDelete = [sessInfo.account_seq];  //세션에서 가져온 account_seq값
+  //쿼리실행
+   conn.query(sqlDelete, paramsDelete, (err, rows, fields) => { //callback함수 (쿼리 실행 뒤에 실행 프로세스)
+     console.log(rows, 'rows');
+
+     if (err) {
+         console.log(err, 'delete 실패');
+         return done(err);
+     }
 
     //가져온 데이터로 render
-    res.redirect('testamInfo', {sess:sessInfo, data : rows});
-
-  });
-  // res.render('testam.ejs');
-})
-// router.get('/ideas/delete/:id', function (req, res) {
-//   client.query('delete from MusicList where id=?', [req.params.id], function () {
-//     res.redirect('/')
-//   })
-// })
-
-// router.get('/insert', function (req, res) {
-//   fs.readFile('insert.html', 'utf8', function (err, data) {
-//     res.send(data)
-//   })
-// })
-
-// router.post('/insert', function (req, res) {
-
-// })
-
-// router.get('/edit/:id', function (req, res) {
-
-// })
-
-// router.post('/edit/:id', function (req, res) {
-
-// })
+    res.redirect('/testam');
+   });
+});
 
 //세션 파싱
 function parseSession(sess)
 {
-  if (typeof sess === 'undefined' || sess.length === 0) return {};
-
     sessInfo = JSON.parse(JSON.stringify(sess));
     sessInfo = sessInfo[0];
     return sessInfo;
