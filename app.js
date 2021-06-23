@@ -15,15 +15,6 @@ const db_config = require('./config/database.js');
 const conn = db_config.init();
 db_config.connect(conn);
 
-// var sql = `SELECT * FROM auth`;
-// conn.query(sql, function(err,rows, fields){
-//     if(err){
-//         console.log(err);
-//     }else{
-//         console.log(rows);
-        
-//     }
-// })
 
 
 //express정보
@@ -71,13 +62,7 @@ app.use(passport.session());
 
 //passport.serializeUser() - 로그인 성공시 호출
 passport.serializeUser((user, done) => { // Strategy 성공 시 호출됨
-  // console.log('---------user - serialize--------------')
-  
-    // console.log(user, '--user-serialize--');
   if ((user.length !== 0 && typeof user["account_id"] != 'undefined') || typeof user["id"] !== 'undefined') {
-    // console.log(user["account_id"], 'user[account_id]')
-    // console.log(user["id"], 'user[id]')
-    // user = JSON.parse(JSON.stringify(user))[0];
     return done(null, user["account_id"] ?? user["id"]); // 여기의 user._id가 req.session.passport.user에 저장
   }
 });
@@ -85,11 +70,8 @@ passport.serializeUser((user, done) => { // Strategy 성공 시 호출됨
 //passport.deserializeUser() - 페이지를 방문할 때마다 콜백함수 실행 (페이지접속 유저가 유효한 유저인지 체크)
 passport.deserializeUser(async (id, done) => { // 매개변수 id는 req.session.passport.user에 저장된 값
   try {
-      console.log(id, '----------------user-deserializeUser------')
       const sql = 'SELECT * FROM auth WHERE account_id = ?';
-// console.log(id, 'deserial- id');
       const params = [id];
-// console.log(sql, id);
       conn.query(sql, params, await function(err,rows, authInfo){
           if(err){
               console.log(err, '로그인유지 실패');
@@ -119,14 +101,12 @@ passport.use(
 ));
 
 
-
+//로그인 처리시 callback
 function chkLogin(info, done) {
 
   const sqlSelect = 'SELECT * FROM auth WHERE account_id = ?';
   const paramsSelect = [info.id];
   conn.query(sqlSelect, paramsSelect, (err, rows, authInfo) => {
-    console.log(rows, '로그인 SELECT --- rows')
-    console.log(rows.length, 'rows.length---')
       if (err) {
           console.log(err, '로그인실패');
           return done(err);
@@ -154,10 +134,7 @@ function chkLogin(info, done) {
                   if (err) {
                     return done(err)
                   }
-//                   console.log(sqlSelect, 'sqlSelect');
-//                   console.log(paramsSelect, )
-//                   console.log(rows, '-----create--select---rows')
-// console.log(JSON.parse(JSON.stringify(rows))[0], 'JSON.parse(JSON.stringify(rows))[0]')
+                  
                   return done(err, JSON.parse(JSON.stringify(rows))[0]);
                 });
               }
@@ -167,7 +144,6 @@ function chkLogin(info, done) {
       } else {
           //기존 있는 데이터
           console.log('기존에 등록된 데이터');
-          console.log(info, 'info');
           return done(err, info);
       }
   });
@@ -179,7 +155,6 @@ function parseSession(sess)
   if (typeof sess === 'undefined' || sess.length === 0) return {};
     sessInfo = JSON.parse(JSON.stringify(sess));
     sessInfo = sessInfo[0];
-    console.log(sessInfo, 'sessInfo');
     return sessInfo;
 }
 
@@ -201,14 +176,12 @@ app.get('/', (req, res) => {
   res.render('main', {sess:sessInfo});
 })
 
+//메인 회원가입수 차트 api
 app.get('/chart', (req, res) => {
   const format = "%Y-%m-%e";
   const sqlSelect = `SELECT DATE_FORMAT(create_date, '${format}') as date, count(*) as cnt FROM auth  GROUP BY DATE_FORMAT(create_date, '${format}') ORDER BY date DESC`;
-  console.log(sqlSelect, 'sqlSelect');
   const paramsSelect = [];
   return conn.query(sqlSelect, paramsSelect, (err, rows, authInfo) => {
-    console.log(rows, 'chart Count rows')
-    console.log(rows.length, 'rows.length---')
       if (err) {
           console.log(err, '로그인실패');
           res.json({'result':false});
@@ -218,7 +191,7 @@ app.get('/chart', (req, res) => {
     });
 });
 
-// ì젙蹂´ 怨듭쑀 ë룞ì쓽 í뙘ì뾽
+// 정보공유 동의처리
 app.post('/setAgree', (req, res) => {
     if (typeof req.user === "undefined") {
         //session expire check

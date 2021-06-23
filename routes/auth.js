@@ -19,7 +19,6 @@ router.get('/kakao', passport.authenticate('kakao', {
   })
 );
 
-
 //kakao 로그아웃 ( 세션끊기 )
 router.get('/kakao/logout', (req, res) => {
     req.logout();
@@ -34,8 +33,6 @@ router.get('/kakao/callback', passport.authenticate('kakao', {
     session:true
   }), (req, res) => {
       console.log('kakao로그인성공 callback');
-    // console.log(req, 'kakao-callback-req')
-    // console.log(res, 'kakao-callback-res')
     res.redirect('/');
   });
 
